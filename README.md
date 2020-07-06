@@ -13,3 +13,8 @@
     - Link
     - Number of Words in the Article
     - Number of "Claps" for the Article
+### How to Use:
+    1. Open terminal and run "python webscraper.py" or run from your favorite python ide.
+    2. Paste the URL of the medium.com article that you wish to scrape information about.
+    3. In the current directory, a "data.txt" file should appear once the script finishes.
+    4. View the scraped information in the "data.txt" file.
