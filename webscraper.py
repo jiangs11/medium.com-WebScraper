@@ -1,11 +1,11 @@
 import os
 import requests
 from bs4 import BeautifulSoup
+from itertools import islice
 
 
 #Use requests to get html and BeautifulSoup to parse it
-def getHTML():
-    userURL = input('Please enter the link: ')
+def getHTML(userURL):
     # headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36'}
     # cookie = {'Cookie': 'aws-priv=eyJ2IjoxLCJldSI6MCwic3QiOjB9; aws_lang=en; x-wl-uid=1qqB55cbZjrg3L/5ASidPnKLm7vU+Fspwr5i6FzpE/D/NQqNHucB8ZPeffvOAZgBWLXj5tPN3fV0=; session-id-time=2082787201l; session-id=132-3769011-5781220; ubid-main=133-0861431-6797846; i18n-prefs=USD; skin=noskin; session-token=vKMvwRImxeCZqtHjutETl/AHyKTdXfv40HfxcTVN5epzu2TOe7U6nOLREziRnhmu6NO4H1Fjr5UuCJvYW6C+gm9beB+yLdKPEIWHDRjE6MTXoXftNecZgyL4GsXqxghL5jdYtgbazsYtaYDuERsBRY4do+yIwtVJAJVQgxfo+mSdkqGaCdVN2Tx5wtLipXzI'}
 
@@ -30,7 +30,7 @@ def getHTML():
     return soup
 
 
-def scraper(parsedPage):
+def scraper(parsedPage, url):
 
     # Finds the first <h1> tag which seems to be a reasonable target for the article's title.
     title = parsedPage.find('h1').text
@@ -59,7 +59,7 @@ def scraper(parsedPage):
 
 
     print(numClaps)
-    wantedInfo = [title, numWords, numClaps]
+    wantedInfo = [title, url, numWords, numClaps]
     return wantedInfo
 
     
@@ -68,22 +68,66 @@ def saveTextFile(infoList):
 
     currentFileLocation = os.path.dirname(os.path.abspath(__file__))
 
+    # Variable to increment data file number ie. data_1.txt ---> data_2.txt
+    currentFileNumber = 1
+
     #Save it in html format
-    myfile = open(currentFileLocation + '/data.txt', 'w')
-    
+    # myfile = open(currentFileLocation + '/data.txt', 'w')
+    filePath = currentFileLocation + '/data_' + str(currentFileNumber) + '.txt'
+    print("path testing: ", filePath)
+    myfile = open(filePath, 'w')
+
     # Clears content of the text file everytime script gets run
-    myfile.truncate(0)
+    # myfile.truncate(0)
 
     for item in infoList:
         myfile.write("%s\n" % item)
 
     myfile.close()
     print('Successfully Written')
+    currentFileNumber = currentFileNumber + 1
+
+
+# To prevent scraping webpages that have already been scraped.
+def check_url_unique(userURL):
+    # Geting directory path and setting up path for directory iteration.
+    directoryPath = os.path.dirname(os.path.abspath(__file__))
+    currentDirectory = str(directoryPath)
+    directory = os.fsencode(currentDirectory)
+
+    # Loop through every file in the current directory.
+    for file in os.listdir(directory):
+        filename = os.fsdecode(file)
+
+        # Only check the text files.
+        if filename.endswith(".txt"):
+            # Open the text file for reading.
+            with open(directoryPath + "/" + filename, 'r') as f:
+                # Gets the second line in the file which has the url.
+                urlFromFile = f.read().split('\n')[1]
+
+            # Check scraped url with the url that the user just entered.
+            if urlFromFile == userURL:
+                # Getting here means that the url was found in the data.txt files
+                # Therefore, webpage has already been scraped before.
+                print("This webpage has already been scraped before!")
+                print("The info is stored in", filename, "!")
+                return False
+        else:
+            continue
+    # Return true, meaning user inputted url webpage hasn't been scraped before.
+    return True
 
 
 def main():
-    html = getHTML()
-    info = scraper(html)
-    saveTextFile(info)
+    userURL = input('Please enter the link: ')
+    uniqueURL = check_url_unique(userURL)
+    
+    # Only perform webscraping on url's that haven't been scraped before.
+    if uniqueURL:
+        html = getHTML(userURL)
+        info = scraper(html, userURL)
+        saveTextFile(info)
 
+# Call main method
 main()

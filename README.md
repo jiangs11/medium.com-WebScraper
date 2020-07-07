@@ -16,5 +16,6 @@
 ### How to Use:
     1. Open terminal and run "python webscraper.py" or run from your favorite python ide.
     2. Paste the URL of the medium.com article that you wish to scrape information about.
-    3. In the current directory, a "data.txt" file should appear once the script finishes.
-    4. View the scraped information in the "data.txt" file.
+    3. In the current directory, a "data_1.txt" file should appear once the script finishes.
+    4. View the scraped information in the "data_1.txt" file.
+    5. Every time the script is run with a unique url, the script will automatically create a new 'data_#.txt' file, where # stands for a number.
