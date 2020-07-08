@@ -22,7 +22,7 @@
     - Plain text of the Article
 
 ### How to Use:
-    1. Clone this repository.
+    1. Download the code in this repository.
     2. Open terminal, locate the directory containing this project, and run "python webscraper.py" or run from your favorite python ide.
     3. Paste the URL of the medium.com article that you wish to scrape information about, as well as providing parameters about the minimum word count and minimum clap count. 
     4. In the current directory, a "all_url_links.txt" file should appear, which holds all urls that have been crawled, starting from the page given.
