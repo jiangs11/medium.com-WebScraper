@@ -7,6 +7,7 @@
 # Libraries
 import os
 import glob
+import shutil
 import requests
 from urllib.request import urlparse, urljoin
 from bs4 import BeautifulSoup
@@ -280,7 +281,7 @@ def saveTextFile(infoList):
 
 # Credit to Greenstick for the awesome progress bar code
 # Code: https://stackoverflow.com/questions/3173320/text-progress-bar-in-the-console
-def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
+def printProgressBar(iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', autosize = False):
     """
     Call in a loop to create terminal progress bar
     @params:
@@ -294,22 +295,31 @@ def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, 
         printEnd    - Optional  : end character (e.g. "\r", "\r\n") (Str)
     """
     percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
+    styling = '%s |%s| %s%% %s' % (prefix, fill, percent, suffix)
+    if autosize:
+        cols, _ = shutil.get_terminal_size(fallback = (length, 1))
+        length = cols - len(styling)
     filledLength = int(length * iteration // total)
     bar = fill * filledLength + '-' * (length - filledLength)
-    print(f'\r{prefix} |{bar}| {percent}% {suffix}', end = printEnd)
+    print('\r%s' % styling.replace(fill, bar), end = '\r')
     # Print New Line on Complete
     if iteration == total: 
         print()
 
 
 def main():    
-    # url = "https://medium.com/shallow-thoughts-about-deep-learning/how-would-we-find-a-better-activation-function-than-relu-4409df217a5c"
-    url = "https://medium.com/@shamoons/what-is-money-e7319685a73"
-    minWords = 1000
-    minClaps = 30
+    ################################################################
+    # PLEASE FILL IN THESE PARAMETERS BEFORE RUNNING THE SCRIPT
+    ################################################################
+    url = ""
+    minWords = 
+    minClaps = 
+    # For some reason, using the script doesn't like the input() function
 
     # Change this to alter how much crawling should be done
+    # Warning!!! Don't set it too high or your computer might crash!!!
     layers = 1
+
 
     directoryPath = os.path.dirname(os.path.abspath(__file__))
     all_url_links_file = 'all_url_links.txt'
@@ -327,7 +337,7 @@ def main():
     for i in range(len(internal_urls)):
         with open(directoryPath + '/' + all_url_links_file, 'r') as f:
 
-            printProgressBar(i+1, len(internal_urls), prefix='Progress', suffix='Complete', length=len(internal_urls))
+            printProgressBar(i+1, len(internal_urls), prefix='Progress', suffix='Complete', length=len(internal_urls), autosize=True)
 
             eachURL = f.read().split('\n')[i+1]
 
@@ -344,7 +354,7 @@ def main():
                 # [:-1] drops the last character from the string
                 number_of_claps = claps_only_number[:-1] * 1000
             else:
-                number_of_claps = claps_only_number * 1000
+                number_of_claps = claps_only_number
 
             # Making sure criteria is met before saving their data
             try:
