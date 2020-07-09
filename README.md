@@ -8,7 +8,7 @@
     2. glob
         - Deleting all text files from current directory.
     3. shutil
-        - Simple terminal progress bar
+        - Simple terminal progress bar.
     4. requests
         - Getting an http request to the webpage.
     5. urlparse, urljoin
