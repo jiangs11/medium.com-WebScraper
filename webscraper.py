@@ -308,13 +308,13 @@ def printProgressBar(iteration, total, prefix = '', suffix = '', decimals = 1, l
 
 
 def main():    
-    ################################################################
-    # PLEASE FILL IN THESE PARAMETERS BEFORE RUNNING THE SCRIPT
-    ################################################################
+    ###############################################################
+    ## PLEASE FILL IN THESE PARAMETERS BEFORE RUNNING THE SCRIPT ##
+    ###############################################################
     url = ""
     minWords = 
     minClaps = 
-    # For some reason, using the script doesn't like the input() function
+    # For some reason, the script doesn't like the input() function
 
     # Change this to alter how much crawling should be done
     # Warning!!! Don't set it too high or your computer might crash!!!
