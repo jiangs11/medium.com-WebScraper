@@ -310,9 +310,11 @@ def main():
     ###############################################################
     ## PLEASE FILL IN THESE PARAMETERS BEFORE RUNNING THE SCRIPT ##
     ###############################################################
-    url = "https://medium.com/shallow-thoughts-about-deep-learning/how-artificial-general-intelligence-might-be-created-1e2476d1516a"
-    minWords = 1000
-    minClaps = 30
+    
+    # url = "https://medium.com/shallow-thoughts-about-deep-learning/how-artificial-general-intelligence-might-be-created-1e2476d1516a"
+    url = ""
+    minWords = 
+    minClaps = 
     # For some reason, the script doesn't like the input() function
 
     # Change this to alter how much crawling should be done
