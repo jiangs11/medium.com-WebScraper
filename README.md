@@ -7,11 +7,13 @@
         - Saving the scraped output into a text file.
     2. glob
         - Deleting all text files from current directory.
-    3. requests
+    3. shutil
+        - Simple terminal progress bar
+    4. requests
         - Getting an http request to the webpage.
-    4. urlparse, urljoin
+    5. urlparse, urljoin
         - Perform parsing and merging of url pieces.
-    5. BeautifulSoup
+    6. BeautifulSoup
         - For getting the actual html of the webpage.
 
 ### Information Scraped:
@@ -23,8 +25,9 @@
 
 ### How to Use:
     1. Download the code in this repository.
-    2. Open terminal, locate the directory containing this project, and run "python webscraper.py" or run from your favorite python ide.
-    3. Paste the URL of the medium.com article that you wish to scrape information about, as well as providing parameters about the minimum word count and minimum clap count. 
-    4. In the current directory, a "all_url_links.txt" file should appear, which holds all urls that have been crawled, starting from the page given.
-    5. Additionally, pages whose info meets the specified parameters will have their own "data_*.txt" file, where * represents a number.
-    6. Every time the script is ran, all the previous .txt files will be deleted, so be sure to save them elsewhere before rerunning the script.
+    2. Open terminal and locate the directory containing this project, 
+    3. Before running, please be sure to fill in the required parameters first (url, minWords, minClaps) inside the script itself.
+    4. Run the script in terminal with "python webscraper.py" or with your favorite Python IDE.
+    5. In the current directory, a "all_url_links.txt" file should appear, which holds all urls that have been crawled, starting from the page inputted.
+    6. Additionally, pages whose information meets the specified parameters will have their own "data_*.txt" file, where * represents a number.
+    7. Every time the script is ran, all the previous .txt files will be deleted, so be sure to save them elsewhere before rerunning the script.
