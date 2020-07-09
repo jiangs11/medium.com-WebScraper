@@ -87,7 +87,7 @@ def get_all_website_links(url: str) -> list:
     return urls
 
 
-def crawler(url: str, layers):
+def crawler(url: str, layers: int):
     """
     Crawls starting url web page and extracts all links. Performs recursive crawling on those links and repeat until base case.
     
@@ -110,7 +110,7 @@ def crawler(url: str, layers):
         crawler(link, layers)
 
 
-def getHTML(userURL):
+def get_html(userURL: str):
     """
     Uses BeautifulSoup to get the HTML of the given url.
 
@@ -144,13 +144,13 @@ def scraper(url) -> list:
     :params url: URL of webpage
     :return:     List of scraped data
     """
-    parsedPage = getHTML(url)
+    parsedPage = get_html(url)
 
     # Call appropriate functions to scrape data
-    articleTitle = getArticleTitle(parsedPage)
-    wordCount = getWordCount(parsedPage)
-    clapCount = getClapCount(parsedPage)
-    articleText = getArticleText(parsedPage)
+    articleTitle = get_article_title(parsedPage)
+    wordCount = get_word_count(parsedPage)
+    clapCount = get_clap_count(parsedPage)
+    articleText = get_article_text(parsedPage)
     
     # Store all scraped data into a list
     wantedInfo = [articleTitle, url, wordCount, clapCount, articleText]
@@ -158,7 +158,7 @@ def scraper(url) -> list:
     return wantedInfo
 
 
-def getArticleTitle(parsedPage) -> str:
+def get_article_title(parsedPage) -> str:
     """
     Finds the first <h1> tag which seems to be a reasonable target for the article's title.   
 
@@ -173,7 +173,7 @@ def getArticleTitle(parsedPage) -> str:
     return title
 
 
-def getWordCount(parsedPage) -> int:
+def get_word_count(parsedPage) -> int:
     """
     Finds all the <p> tags with an "id" attribute.
     Not 100% accurate word count since this also grabs <p> tags not in the article.
@@ -199,7 +199,7 @@ def getWordCount(parsedPage) -> int:
     return numWords
 
 
-def getClapCount(parsedPage) -> int:
+def get_clap_count(parsedPage) -> int:
     """
     Medium.com has a clap count for each article, which is basically equivalent to a like.
 
@@ -226,7 +226,7 @@ def getClapCount(parsedPage) -> int:
     return numClaps
 
 
-def getArticleText(parsedPage) -> str:
+def get_article_text(parsedPage) -> str:
     """
     Finds all the <p> tags with an "id" attribute.
     Not 100% accurate word count since this also grabs <p> tags not in the article.
@@ -251,8 +251,7 @@ def getArticleText(parsedPage) -> str:
     return textFromArticle
 
 
-# Accepts a list of all the info that were scraped
-def saveTextFile(infoList):
+def save_text_file(infoList: list):
     """
     Saves scraped data of articles that meet the user specified criteria.
     Automatically generates new text file in the current directory.
@@ -281,7 +280,7 @@ def saveTextFile(infoList):
 
 # Credit to Greenstick for the awesome progress bar code
 # Code: https://stackoverflow.com/questions/3173320/text-progress-bar-in-the-console
-def printProgressBar(iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', autosize = False):
+def print_progress_bar(iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', autosize = False):
     """
     Call in a loop to create terminal progress bar
     @params:
@@ -311,15 +310,14 @@ def main():
     ###############################################################
     ## PLEASE FILL IN THESE PARAMETERS BEFORE RUNNING THE SCRIPT ##
     ###############################################################
-    url = ""
-    minWords = 
-    minClaps = 
+    url = "https://medium.com/shallow-thoughts-about-deep-learning/how-artificial-general-intelligence-might-be-created-1e2476d1516a"
+    minWords = 1000
+    minClaps = 30
     # For some reason, the script doesn't like the input() function
 
     # Change this to alter how much crawling should be done
     # Warning!!! Don't set it too high or your computer might crash!!!
     layers = 1
-
 
     directoryPath = os.path.dirname(os.path.abspath(__file__))
     all_url_links_file = 'all_url_links.txt'
@@ -337,7 +335,7 @@ def main():
     for i in range(len(internal_urls)):
         with open(directoryPath + '/' + all_url_links_file, 'r') as f:
 
-            printProgressBar(i+1, len(internal_urls), prefix='Progress', suffix='Complete', length=len(internal_urls), autosize=True)
+            print_progress_bar(i+1, len(internal_urls), prefix='Progress', suffix='Complete', length=len(internal_urls), autosize=True)
 
             eachURL = f.read().split('\n')[i+1]
 
@@ -366,7 +364,7 @@ def main():
 
             # Making it here means that the article successfully met our criteria
             # Saves all scraped information into their own text file
-            saveTextFile(wantedInfo)
+            save_text_file(wantedInfo)
 
 
 # Automatically removes every .txt file from the directory before beginning new scrape run
