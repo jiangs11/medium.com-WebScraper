@@ -1,3 +1,10 @@
+# Name: Steven Jiang
+# Date: 7/9/2020
+# Purpose: Coding Challenge
+# Description: Simple web crawler and web scraper for medium.com articles
+
+
+# Libraries
 import os
 import glob
 import requests
@@ -33,6 +40,7 @@ def get_all_website_links(url: str) -> list:
     """
 
     # All urls of `url` parameter
+    # Using a set for unique elements
     urls = set()
 
     # Domain name of the url without the protocol (https)
@@ -54,6 +62,7 @@ def get_all_website_links(url: str) -> list:
 
         # Join the url if it's relative (not absolute link)
         href = urljoin(url, href)
+
         # urlparse() returns a ParseResult object with [scheme, netloc, path, params, query]
         parsed_href = urlparse(href)
 
@@ -68,22 +77,22 @@ def get_all_website_links(url: str) -> list:
             # We only want unique url links
             continue
         if domain_name not in href:
-            # External link
+            # External link; links to domain outside of medium.com
             continue
 
-        print(f"[*] Internal link: {href}")
         urls.add(href)
         internal_urls.add(href)
 
     return urls
 
 
-def crawler(url: str, max_urls=50):
+def crawler(url: str, layers):
     """
     Crawls starting url web page and extracts all links. Performs recursive crawling on those links and repeat until base case.
     
-    :params max_urls: Number of urls to crawl. This is to prevent infinite recursive calls and crash my/your computer :)
-    :return:          None
+    :params url:    URL of webpage
+    :params layers: Number of layers to crawl. This is to prevent infinite recursive calls and crash my/your computer :)
+    :return:        None
     """
 
     global total_urls_visited
@@ -95,17 +104,19 @@ def crawler(url: str, max_urls=50):
     # Loop through each url and recursively get all links on that page
     for link in links:
         # Specify a base case to exit recursion
-        if total_urls_visited > max_urls:
+        if total_urls_visited > layers:
             break
-        crawler(link, max_urls=max_urls)
+        crawler(link, layers)
 
 
 def getHTML(userURL):
     """
-    
+    Uses BeautifulSoup to get the HTML of the given url.
+
+    :params userURL: URL of webpage
+    :return:         BeautifulSoup object, which is essentially a HTML document
     """
     try:
-        # result = requests.get(url = resource, headers=headers, cookies=cookie)
         # Perform an HTTP GET request on the given url link
         result = requests.get(url = userURL)
 
@@ -119,93 +130,121 @@ def getHTML(userURL):
         print('\nSuccessfully Parsed')
         
         # Returns the html of the webpage
-        print(type(soup))
         return soup
     except:
         print('Something went wrong in getting the HTML code\n')
         return 
     
 
-
-def scraper(url):
+def scraper(url) -> list:
     """
+    Uses BeautifulSoup to scrape data from the webpages.
 
+    :params url: URL of webpage
+    :return:     List of scraped data
     """
     parsedPage = getHTML(url)
 
+    # Call appropriate functions to scrape data
     articleTitle = getArticleTitle(parsedPage)
     wordCount = getWordCount(parsedPage)
     clapCount = getClapCount(parsedPage)
     articleText = getArticleText(parsedPage)
     
+    # Store all scraped data into a list
     wantedInfo = [articleTitle, url, wordCount, clapCount, articleText]
 
     return wantedInfo
 
 
-def getArticleTitle(parsedPage):
+def getArticleTitle(parsedPage) -> str:
     """
-    # Finds the first <h1> tag which seems to be a reasonable target for the article's title.    
+    Finds the first <h1> tag which seems to be a reasonable target for the article's title.   
+
+    :params parsedPage: HTML provided by BeautifulSoup 
+    :return:            String of the article's title          
     """
     if parsedPage is None or parsedPage.find('h1') is None:
+        # Error in getting HTML or <h1> tag does not exist
         return ""
     
     title = parsedPage.find('h1').text
     return title
 
 
-def getWordCount(parsedPage):
+def getWordCount(parsedPage) -> int:
     """
     Finds all the <p> tags with an "id" attribute.
     Not 100% accurate word count since this also grabs <p> tags not in the article.
     ie. "About the author" text may also be counted.
+
+    :params parsedPage: HTML provided by BeautifulSoup 
+    :return:            Close estimate number of words in the article       
     """
     if parsedPage is None or parsedPage.find_all('p', {'id': True}) is None:
+        # Error in getting HTML or <p> tag does not exist
         return 0
 
+    # Each <p> tag element will be stored in the list
     wordList = parsedPage.find_all('p', {'id': True})
 
     textFromArticle = ""
 
     for i in range(len(wordList)):
+        # Save all text into a string variable
         textFromArticle = textFromArticle + wordList[i].text + " "
 
     numWords = len(textFromArticle.split())
     return numWords
 
 
-def getClapCount(parsedPage):
+def getClapCount(parsedPage) -> int:
     """
+    Medium.com has a clap count for each article, which is basically equivalent to a like.
 
+    :params parsedPage: HTML provided by BeautifulSoup 
+    :return:            Number of claps for the article     
     """
     if parsedPage is None or parsedPage.find_all('h4') is None:
+        # Error in getting HTML or <h4> tag does not exist
         return 0
 
+    # The pattern I saw for number of claps in the page was a <h4> tag followed by a <button>
+    # Therefore, below I have found all <h4> tag elements, which will be considered as my candidates
     numClapsCandidates = parsedPage.find_all('h4')
     numClaps = 0
 
     for j in range(len(numClapsCandidates)):
+        # Here, we begin looking for <button> right after in the DOM
         child = numClapsCandidates[j].find('button')
+
         if child is not None:
+            # Found the first <button> after a <h4> tag
             numClaps = child.text
 
     return numClaps
 
 
-def getArticleText(parsedPage):
+def getArticleText(parsedPage) -> str:
     """
     Finds all the <p> tags with an "id" attribute.
     Not 100% accurate word count since this also grabs <p> tags not in the article.
     ie. "About the author" text may also be counted.
+
+    :params parsedPage: HTML provided by BeautifulSoup 
+    :return:            String of the article's text   
     """
     if parsedPage is None or parsedPage.find_all('p', {'id': True}) is None:
+        # Error in getting HTML or <p> tag does not exist
         return ""
     
+    # Each <p> tag element will be stored in the list
     wordList = parsedPage.find_all('p', {'id': True})
 
     textFromArticle = ""
 
     for i in range(len(wordList)):
+        # Save all text into a string variable
         textFromArticle = textFromArticle + wordList[i].text + " "
 
     return textFromArticle
@@ -213,15 +252,25 @@ def getArticleText(parsedPage):
 
 # Accepts a list of all the info that were scraped
 def saveTextFile(infoList):
+    """
+    Saves scraped data of articles that meet the user specified criteria.
+    Automatically generates new text file in the current directory.
 
+    :params infoList: List returned by the scrape() function
+    :return:          None
+    """
+
+    # Gets the current directory path holding this python script
     currentFileLocation = os.path.dirname(os.path.abspath(__file__))
 
     # Global variable to increment data file number ie. data_1.txt ---> data_2.txt
     global current_file_number
 
+    # Forge a directory path for the text file to be saved to (still in this directory)
     filePath = currentFileLocation + '/data_' + str(current_file_number) + '.txt'
 
     with open(filePath, 'w', encoding="utf-8") as myfile:
+        # For each element in the list, writes the data on a new line
         for item in infoList:
             myfile.write("%s\n" % item)
 
@@ -254,42 +303,42 @@ def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, 
 
 
 def main():    
-    url = "https://medium.com/shallow-thoughts-about-deep-learning/how-would-we-find-a-better-activation-function-than-relu-4409df217a5c"
+    # url = "https://medium.com/shallow-thoughts-about-deep-learning/how-would-we-find-a-better-activation-function-than-relu-4409df217a5c"
+    url = "https://medium.com/@shamoons/what-is-money-e7319685a73"
     minWords = 1000
     minClaps = 30
 
     # Change this to alter how much crawling should be done
-    # Misleading name, doesn't actually only crawl for specified number of max url
-    max_urls = 1
+    layers = 1
 
     directoryPath = os.path.dirname(os.path.abspath(__file__))
     all_url_links_file = 'all_url_links.txt'
 
-    crawler(url, max_urls=max_urls)
+    crawler(url, layers)
 
-    print("[+] Total URL links:", len(internal_urls))
-
-    # domain_name = urlparse(url).netloc
+    print("Total URL links:", len(internal_urls))
     
-    # Save the internal links to a file
+    # Save all links crawled to a file
     with open(all_url_links_file, 'w') as f:
         for internal_link in internal_urls:
             print(internal_link.strip(), file=f)
 
+    # Loops through each link that was crawled
     for i in range(len(internal_urls)):
         with open(directoryPath + '/' + all_url_links_file, 'r') as f:
-            # index = 1
+
             printProgressBar(i+1, len(internal_urls), prefix='Progress', suffix='Complete', length=len(internal_urls))
-            # Gets the second line in the file which has the url.
-            # eachURL = f.read().split('\n')[line]
+
             eachURL = f.read().split('\n')[i+1]
 
+            # Starts scraping each URL in the all_url_links.txt file
             wantedInfo = scraper(eachURL)
 
             number_of_words = wantedInfo[2]
 
             # ie. turns "1.2K claps" into "1.2K"
             claps_only_number = str(wantedInfo[3]).split()[0]
+
             # ie. turns "1.2K" into "1200"
             if claps_only_number[-1] == "K":
                 # [:-1] drops the last character from the string
@@ -297,12 +346,16 @@ def main():
             else:
                 number_of_claps = claps_only_number * 1000
 
-            if int(number_of_words) < minWords or int(number_of_claps) < minClaps:
-                # Article info does not meet specified requirement
+            # Making sure criteria is met before saving their data
+            try:
+                if int(number_of_words) < minWords or int(number_of_claps) < minClaps:
+                    # Article info does not meet specified requirement
+                    continue
+            except: 
                 continue
-            
+
             # Making it here means that the article successfully met our criteria
-            # Saves all information into a text file
+            # Saves all scraped information into their own text file
             saveTextFile(wantedInfo)
 
 
